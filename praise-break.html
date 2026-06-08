@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Praise Break</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  :root {
+    --purple-light: #9b8fd4;
+    --purple-dark: #6b3fa0;
+    --orange: #c85a2a;
+    --orange-btn: #c85a2a;
+    --bg-blue: #a8a0e8;
+    --bg-orange: #e8855a;
+    --white: #ffffff;
+  }
+
+  html, body {
+    height: 100%;
+    font-family: 'Nunito', sans-serif;
+    background: #1a1a2e;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  /* Phone shell */
+  .phone {
+    width: 390px;
+    height: 844px;
+    border-radius: 50px;
+    background: #fff;
+    overflow: hidden;
+    box-shadow: 0 40px 100px rgba(0,0,0,0.5), inset 0 0 0 2px #333;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Status bar */
+  .status-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 28px 0;
+    background: #fff;
+    z-index: 10;
+    min-height: 44px;
+    font-weight: 800;
+    font-size: 15px;
+    color: #111;
+    font-family: 'Nunito', sans-serif;
+  }
+  .status-right {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 13px;
+    font-weight: 700;
+  }
+  .signal-bars { display: flex; gap: 2px; align-items: flex-end; }
+  .signal-bars span {
+    width: 3px;
+    background: #111;
+    border-radius: 1px;
+  }
+  .signal-bars span:nth-child(1) { height: 5px; }
+  .signal-bars span:nth-child(2) { height: 8px; }
+  .signal-bars span:nth-child(3) { height: 11px; }
+  .signal-bars span:nth-child(4) { height: 14px; }
+  .battery {
+    width: 24px; height: 12px;
+    border: 2px solid #111;
+    border-radius: 3px;
+    position: relative;
+    display: inline-block;
+  }
+  .battery::after {
+    content: '';
+    position: absolute;
+    right: -5px; top: 50%;
+    transform: translateY(-50%);
+    width: 3px; height: 6px;
+    background: #111;
+    border-radius: 0 2px 2px 0;
+  }
+
+  /* Nav bar */
+  .nav-bar {
+    display: flex;
+    align-items: center;
+    padding: 6px 16px 8px;
+    background: #fff;
+    position: relative;
+    z-index: 10;
+  }
+  .nav-back {
+    color: #007aff;
+    font-size: 17px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    cursor: pointer;
+    user-select: none;
+    transition: opacity 0.15s;
+  }
+  .nav-back:active { opacity: 0.5; }
+  .nav-back .chevron {
+    font-size: 20px;
+    line-height: 1;
+    margin-top: -1px;
+  }
+  .nav-title {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    font-weight: 800;
+    font-size: 18px;
+    color: #111;
+  }
+
+  /* Screens */
+  .screen {
+    flex: 1;
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .screen.active { display: flex; }
+
+  /* ===== HOME SCREEN ===== */
+  #home-screen .content {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+  }
+  .home-bg {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .home-bg .left { background: var(--bg-blue); }
+  .home-bg .right { background: var(--bg-orange); }
+
+  .dancer-figure {
+    position: absolute;
+    top: 0; left: 0;
+    width: 55%;
+    height: 55%;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    padding: 10px 0 0 20px;
+  }
+  .dancer-svg { width: 100%; height: 100%; }
+
+  .preacher-figure {
+    position: absolute;
+    bottom: 0; right: 0;
+    width: 55%;
+    height: 55%;
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+    padding: 0 10px 0 0;
+  }
+  .preacher-svg { width: 100%; height: 100%; }
+
+  .home-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    width: 85%;
+  }
+  .choose-mode-text {
+    font-family: 'Fredoka One', cursive;
+    font-size: 28px;
+    color: #fff;
+    text-shadow: 2px 3px 0 rgba(0,0,0,0.25);
+    white-space: nowrap;
+  }
+  .mode-btn {
+    width: 100%;
+    padding: 18px 0;
+    border-radius: 18px;
+    border: none;
+    background: var(--orange-btn);
+    color: #fff;
+    font-family: 'Fredoka One', cursive;
+    font-size: 30px;
+    letter-spacing: 2px;
+    cursor: pointer;
+    box-shadow: 0 6px 0 #8b3a18, 0 10px 20px rgba(0,0,0,0.3);
+    transition: transform 0.1s, box-shadow 0.1s;
+    user-select: none;
+  }
+  .mode-btn:active {
+    transform: translateY(4px);
+    box-shadow: 0 2px 0 #8b3a18, 0 4px 10px rgba(0,0,0,0.2);
+  }
+
+  /* ===== PREACH SCREEN ===== */
+  #preach-screen {
+    background: var(--bg-blue);
+  }
+  #preach-screen .nav-bar { background: transparent; }
+  #preach-screen .status-bar { background: transparent; }
+
+  .preach-content {
+    flex: 1;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 28px;
+    padding: 20px;
+    overflow: hidden;
+  }
+
+  .mic-bg-figure {
+    position: absolute;
+    top: -20px; left: -30px;
+    width: 320px;
+    height: 420px;
+    opacity: 0.6;
+  }
+
+  .choose-key-text {
+    font-family: 'Fredoka One', cursive;
+    font-size: 34px;
+    color: #fff;
+    text-shadow: 2px 3px 6px rgba(180,80,20,0.4);
+    z-index: 2;
+    position: relative;
+  }
+
+  .key-select-wrapper {
+    position: relative;
+    z-index: 2;
+    width: 80%;
+  }
+  .key-select {
+    width: 100%;
+    padding: 16px 50px 16px 20px;
+    border-radius: 14px;
+    border: none;
+    background: rgba(255,255,255,0.92);
+    font-family: 'Nunito', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: #333;
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    outline: none;
+  }
+  .select-arrow {
+    position: absolute;
+    right: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    font-size: 18px;
+    color: #555;
+  }
+
+  .action-btn {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    border: none;
+    background: var(--orange-btn);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 6px 0 #8b3a18, 0 12px 30px rgba(0,0,0,0.3);
+    transition: transform 0.1s, box-shadow 0.1s;
+    z-index: 2;
+    position: relative;
+    user-select: none;
+  }
+  .action-btn:active {
+    transform: translateY(4px);
+    box-shadow: 0 2px 0 #8b3a18, 0 4px 10px rgba(0,0,0,0.2);
+  }
+  .action-btn svg { width: 48px; height: 48px; fill: #fff; }
+
+  /* ===== PRAISE SCREEN ===== */
+  #praise-screen {
+    background: var(--bg-blue);
+  }
+  #praise-screen .nav-bar { background: transparent; }
+  #praise-screen .status-bar { background: transparent; }
+
+  .praise-content {
+    flex: 1;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 28px;
+    padding: 20px;
+    overflow: hidden;
+  }
+
+  /* ===== AUDIO PLAYER STATE ===== */
+  .playing-indicator {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    z-index: 2;
+    position: relative;
+  }
+  .playing-indicator.visible { display: flex; }
+  .bars-container {
+    display: flex;
+    align-items: flex-end;
+    gap: 5px;
+    height: 50px;
+  }
+  .bar {
+    width: 8px;
+    background: #fff;
+    border-radius: 4px;
+    animation: bounce 0.8s ease-in-out infinite;
+  }
+  .bar:nth-child(1) { height: 20px; animation-delay: 0s; }
+  .bar:nth-child(2) { height: 35px; animation-delay: 0.1s; }
+  .bar:nth-child(3) { height: 50px; animation-delay: 0.2s; }
+  .bar:nth-child(4) { height: 30px; animation-delay: 0.15s; }
+  .bar:nth-child(5) { height: 18px; animation-delay: 0.05s; }
+  @keyframes bounce {
+    0%, 100% { transform: scaleY(0.4); }
+    50% { transform: scaleY(1); }
+  }
+  .now-playing-label {
+    color: #fff;
+    font-weight: 800;
+    font-size: 15px;
+    letter-spacing: 1px;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  }
+
+  /* Responsive for actual mobile */
+  @media (max-width: 430px) {
+    .phone {
+      width: 100vw;
+      height: 100vh;
+      border-radius: 0;
+      box-shadow: none;
+    }
+    body { background: #000; }
+  }
+</style>
+</head>
+<body>
+
+<div class="phone">
+
+  <!-- ===== HOME SCREEN ===== -->
+  <div id="home-screen" class="screen active">
+    <div class="status-bar">
+      <span>3:57</span>
+      <div class="status-right">
+        <div class="signal-bars">
+          <span></span><span></span><span></span><span></span>
+        </div>
+        <span>5G</span>
+        <div class="battery"></div>
+      </div>
+    </div>
+    <div class="nav-bar" style="justify-content:center;">
+      <span class="nav-title" style="position:relative;left:auto;transform:none;">Praise Break</span>
+    </div>
+    <div class="content">
+      <div class="home-bg">
+        <div class="left"></div>
+        <div class="right"></div>
+      </div>
+
+      <!-- Dancer silhouette top-left -->
+      <div class="dancer-figure">
+        <svg class="dancer-svg" viewBox="0 0 200 260" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- body -->
+          <ellipse cx="95" cy="55" rx="25" ry="30" fill="#6b3fa0"/>
+          <!-- head -->
+          <circle cx="100" cy="22" r="20" fill="#6b3fa0"/>
+          <!-- torso -->
+          <rect x="72" y="80" width="50" height="70" rx="10" fill="#6b3fa0"/>
+          <!-- white shirt detail -->
+          <polygon points="95,82 110,82 100,140 90,140" fill="#fff"/>
+          <!-- left arm raised -->
+          <path d="M72,90 Q30,50 10,20" stroke="#6b3fa0" stroke-width="18" stroke-linecap="round" fill="none"/>
+          <!-- right arm out -->
+          <path d="M122,100 Q170,90 200,110" stroke="#6b3fa0" stroke-width="18" stroke-linecap="round" fill="none"/>
+          <!-- left leg -->
+          <path d="M85,148 Q70,200 55,250" stroke="#6b3fa0" stroke-width="18" stroke-linecap="round" fill="none"/>
+          <!-- right leg kicked up -->
+          <path d="M107,148 Q140,170 175,140" stroke="#6b3fa0" stroke-width="18" stroke-linecap="round" fill="none"/>
+        </svg>
+      </div>
+
+      <!-- Preacher silhouette bottom-right -->
+      <div class="preacher-figure">
+        <svg class="preacher-svg" viewBox="0 0 200 280" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- body/robe -->
+          <rect x="30" y="110" width="140" height="170" rx="14" fill="#6b3fa0"/>
+          <!-- collar white -->
+          <rect x="82" y="108" width="36" height="30" rx="6" fill="#fff"/>
+          <!-- collar black strip -->
+          <rect x="92" y="108" width="16" height="22" rx="3" fill="#222"/>
+          <!-- torso shoulders -->
+          <rect x="20" y="105" width="160" height="30" rx="14" fill="#6b3fa0"/>
+          <!-- head -->
+          <circle cx="100" cy="72" r="36" fill="#6b3fa0"/>
+          <!-- left arm holding mic -->
+          <path d="M30,130 Q10,160 15,195" stroke="#6b3fa0" stroke-width="20" stroke-linecap="round" fill="none"/>
+          <!-- hand -->
+          <ellipse cx="18" cy="200" rx="13" ry="15" fill="#fff"/>
+          <!-- mic -->
+          <rect x="6" y="188" width="12" height="28" rx="6" fill="#222"/>
+          <ellipse cx="12" cy="186" rx="9" ry="11" fill="#333"/>
+          <!-- right arm -->
+          <path d="M170,130 Q185,155 180,180" stroke="#6b3fa0" stroke-width="20" stroke-linecap="round" fill="none"/>
+        </svg>
+      </div>
+
+      <div class="home-center">
+        <div class="choose-mode-text">Choose Your Mode</div>
+        <button class="mode-btn" onclick="goTo('praise')">PRAISE</button>
+        <button class="mode-btn" onclick="goTo('preach')">PREACH</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== PREACH SCREEN ===== -->
+  <div id="preach-screen" class="screen">
+    <div class="status-bar">
+      <span>3:57</span>
+      <div class="status-right">
+        <div class="signal-bars">
+          <span></span><span></span><span></span><span></span>
+        </div>
+        <span>5G</span>
+        <div class="battery"></div>
+      </div>
+    </div>
+    <div class="nav-bar">
+      <div class="nav-back" onclick="goTo('home')">
+        <span class="chevron">‹</span>
+        <span>Praise Break</span>
+      </div>
+      <span class="nav-title">Preach</span>
+    </div>
+
+    <div class="preach-content">
+      <!-- Background mic silhouette -->
+      <svg class="mic-bg-figure" viewBox="0 0 280 380" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="120" cy="90" rx="55" ry="65" fill="rgba(255,255,255,0.15)"/>
+        <rect x="90" y="150" width="60" height="120" rx="10" fill="rgba(255,255,255,0.12)"/>
+        <circle cx="95" cy="42" r="42" fill="rgba(255,255,255,0.12)"/>
+        <path d="M60,165 Q20,210 25,260" stroke="rgba(255,255,255,0.12)" stroke-width="30" stroke-linecap="round" fill="none"/>
+        <ellipse cx="28" cy="268" rx="22" ry="26" fill="rgba(255,255,255,0.18)"/>
+        <rect x="10" y="248" width="20" height="46" rx="10" fill="rgba(100,100,120,0.3)"/>
+        <ellipse cx="20" cy="244" rx="16" ry="20" fill="rgba(120,120,140,0.3)"/>
+        <path d="M155,170 Q185,200 180,235" stroke="rgba(255,255,255,0.12)" stroke-width="30" stroke-linecap="round" fill="none"/>
+        <rect x="65" y="265" width="115" height="115" rx="14" fill="rgba(255,255,255,0.1)"/>
+      </svg>
+
+      <div class="choose-key-text">Choose Your Key</div>
+
+      <div class="key-select-wrapper">
+        <select class="key-select" id="preach-key">
+          <option value="Ab">Ab</option>
+          <option value="A">A</option>
+          <option value="Bb">Bb</option>
+          <option value="B">B</option>
+          <option value="C">C</option>
+          <option value="Db">Db</option>
+          <option value="D">D</option>
+          <option value="Eb">Eb</option>
+          <option value="E">E</option>
+          <option value="F">F</option>
+          <option value="Gb">Gb</option>
+          <option value="G">G</option>
+        </select>
+        <span class="select-arrow">⌄</span>
+      </div>
+
+      <!-- Playing indicator -->
+      <div class="playing-indicator" id="preach-playing">
+        <div class="bars-container">
+          <div class="bar"></div>
+          <div class="bar"></div>
+          <div class="bar"></div>
+          <div class="bar"></div>
+          <div class="bar"></div>
+        </div>
+        <div class="now-playing-label" id="preach-playing-label">Playing in Ab</div>
+      </div>
+
+      <!-- Play button -->
+      <button class="action-btn" id="preach-play-btn" onclick="togglePlay('preach')">
+        <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
+      </button>
+
+      <!-- Stop/Alert button -->
+      <button class="action-btn" onclick="stopPlay('preach')" style="background:#b04a1e;">
+        <svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- ===== PRAISE SCREEN ===== -->
+  <div id="praise-screen" class="screen">
+    <div class="status-bar">
+      <span>3:57</span>
+      <div class="status-right">
+        <div class="signal-bars">
+          <span></span><span></span><span></span><span></span>
+        </div>
+        <span>5G</span>
+        <div class="battery"></div>
+      </div>
+    </div>
+    <div class="nav-bar">
+      <div class="nav-back" onclick="goTo('home')">
+        <span class="chevron">‹</span>
+        <span>Praise Break</span>
+      </div>
+      <span class="nav-title">Praise</span>
+    </div>
+
+    <div class="praise-content">
+      <!-- Background dancer silhouette -->
+      <svg style="position:absolute;top:-10px;right:-20px;width:280px;height:360px;opacity:0.5;" viewBox="0 0 200 260" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="95" cy="55" rx="25" ry="30" fill="rgba(255,255,255,0.25)"/>
+        <circle cx="100" cy="22" r="20" fill="rgba(255,255,255,0.25)"/>
+        <rect x="72" y="80" width="50" height="70" rx="10" fill="rgba(255,255,255,0.2)"/>
+        <path d="M72,90 Q30,50 10,20" stroke="rgba(255,255,255,0.2)" stroke-width="18" stroke-linecap="round" fill="none"/>
+        <path d="M122,100 Q170,90 200,110" stroke="rgba(255,255,255,0.2)" stroke-width="18" stroke-linecap="round" fill="none"/>
+        <path d="M85,148 Q70,200 55,250" stroke="rgba(255,255,255,0.2)" stroke-width="18" stroke-linecap="round" fill="none"/>
+        <path d="M107,148 Q140,170 175,140" stroke="rgba(255,255,255,0.2)" stroke-width="18" stroke-linecap="round" fill="none"/>
+      </svg>
+
+      <div class="choose-key-text">Choose Your Key</div>
+
+      <div class="key-select-wrapper">
+        <select class="key-select" id="praise-key">
+          <option value="Ab">Ab</option>
+          <option value="A">A</option>
+          <option value="Bb">Bb</option>
+          <option value="B">B</option>
+          <option value="C">C</option>
+          <option value="Db">Db</option>
+          <option value="D">D</option>
+          <option value="Eb">Eb</option>
+          <option value="E">E</option>
+          <option value="F">F</option>
+          <option value="Gb">Gb</option>
+          <option value="G">G</option>
+        </select>
+        <span class="select-arrow">⌄</span>
+      </div>
+
+      <!-- Playing indicator -->
+      <div class="playing-indicator" id="praise-playing">
+        <div class="bars-container">
+          <div class="bar"></div>
+          <div class="bar"></div>
+          <div class="bar"></div>
+          <div class="bar"></div>
+          <div class="bar"></div>
+        </div>
+        <div class="now-playing-label" id="praise-playing-label">Playing in Ab</div>
+      </div>
+
+      <!-- Play button -->
+      <button class="action-btn" id="praise-play-btn" onclick="togglePlay('praise')">
+        <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
+      </button>
+
+      <!-- Stop button -->
+      <button class="action-btn" onclick="stopPlay('praise')" style="background:#b04a1e;">
+        <svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/></svg>
+      </button>
+    </div>
+  </div>
+
+</div><!-- end .phone -->
+
+<script>
+  // ---- Navigation ----
+  function goTo(screen) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(screen + '-screen').classList.add('active');
+  }
+
+  // ---- Audio engine using Web Audio API to generate gospel-style tones ----
+  let audioCtx = null;
+  let currentNodes = {};
+  let isPlaying = { preach: false, praise: false };
+
+  // Key to frequency (root note)
+  const keyFreqs = {
+    'Ab': 207.65, 'A': 220.00, 'Bb': 233.08, 'B': 246.94,
+    'C': 261.63, 'Db': 277.18, 'D': 293.66, 'Eb': 311.13,
+    'E': 329.63, 'F': 349.23, 'Gb': 369.99, 'G': 392.00
+  };
+
+  // Gospel praise break chord intervals (major triad + 7th + extended)
+  const PRAISE_INTERVALS = [1, 1.25, 1.5, 1.875]; // root, M3, P5, M7
+  const PREACH_INTERVALS = [1, 1.25, 1.5, 1.667]; // root, M3, P5, m7
+
+  function getCtx() {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    return audioCtx;
+  }
+
+  function playGospelChord(mode) {
+    const ctx = getCtx();
+    const key = document.getElementById(mode + '-key').value;
+    const root = keyFreqs[key];
+    const intervals = mode === 'praise' ? PRAISE_INTERVALS : PREACH_INTERVALS;
+
+    // Stop previous
+    stopNodes(mode);
+    const gainMaster = ctx.createGain();
+    gainMaster.gain.setValueAtTime(0, ctx.currentTime);
+    gainMaster.gain.linearRampToValueAtTime(0.18, ctx.currentTime + 0.3);
+    gainMaster.connect(ctx.destination);
+
+    // Reverb-like: convolver simulation via delay
+    const delay = ctx.createDelay(0.5);
+    delay.delayTime.value = 0.08;
+    const feedbackGain = ctx.createGain();
+    feedbackGain.gain.value = 0.35;
+    delay.connect(feedbackGain);
+    feedbackGain.connect(delay);
+    delay.connect(gainMaster);
+
+    const oscList = [];
+    intervals.forEach((ratio, i) => {
+      const osc = ctx.createOscillator();
+      const noteGain = ctx.createGain();
+      osc.type = i === 0 ? 'sawtooth' : 'triangle';
+      osc.frequency.value = root * ratio;
+      noteGain.gain.value = i === 0 ? 0.6 : 0.35;
+      osc.connect(noteGain);
+      noteGain.connect(gainMaster);
+      noteGain.connect(delay);
+      osc.start();
+      oscList.push({ osc, gain: noteGain });
+    });
+
+    // LFO for vibrato on lead
+    const lfo = ctx.createOscillator();
+    const lfoGain = ctx.createGain();
+    lfo.frequency.value = 5.5;
+    lfoGain.gain.value = 3;
+    lfo.connect(lfoGain);
+    lfoGain.connect(oscList[0].osc.frequency);
+    lfo.start();
+
+    currentNodes[mode] = { oscList, gainMaster, delay, feedbackGain, lfo, lfoGain };
+  }
+
+  function stopNodes(mode) {
+    if (currentNodes[mode]) {
+      try {
+        const { oscList, gainMaster, lfo } = currentNodes[mode];
+        const ctx = getCtx();
+        gainMaster.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.4);
+        setTimeout(() => {
+          oscList.forEach(({ osc }) => { try { osc.stop(); } catch(e){} });
+          try { lfo.stop(); } catch(e){}
+        }, 450);
+      } catch(e){}
+      currentNodes[mode] = null;
+    }
+  }
+
+  function togglePlay(mode) {
+    const btn = document.getElementById(mode + '-play-btn');
+    const indicator = document.getElementById(mode + '-playing');
+    const label = document.getElementById(mode + '-playing-label');
+    const key = document.getElementById(mode + '-key').value;
+
+    if (isPlaying[mode]) {
+      // Pause
+      stopNodes(mode);
+      isPlaying[mode] = false;
+      btn.innerHTML = '<svg viewBox="0 0 24 24" fill="white"><polygon points="5,3 19,12 5,21"/></svg>';
+      indicator.classList.remove('visible');
+    } else {
+      // Play
+      playGospelChord(mode);
+      isPlaying[mode] = true;
+      btn.innerHTML = '<svg viewBox="0 0 24 24" fill="white"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>';
+      label.textContent = 'Playing in ' + key;
+      indicator.classList.add('visible');
+    }
+  }
+
+  function stopPlay(mode) {
+    const btn = document.getElementById(mode + '-play-btn');
+    const indicator = document.getElementById(mode + '-playing');
+    stopNodes(mode);
+    isPlaying[mode] = false;
+    btn.innerHTML = '<svg viewBox="0 0 24 24" fill="white"><polygon points="5,3 19,12 5,21"/></svg>';
+    indicator.classList.remove('visible');
+  }
+
+  // When key changes while playing, restart in new key
+  ['preach', 'praise'].forEach(mode => {
+    document.getElementById(mode + '-key').addEventListener('change', function() {
+      if (isPlaying[mode]) {
+        playGospelChord(mode);
+        const label = document.getElementById(mode + '-playing-label');
+        label.textContent = 'Playing in ' + this.value;
+      }
+    });
+  });
+</script>
+</body>
+</html>
